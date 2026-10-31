@@ -72,11 +72,13 @@ public class PlayerController : MonoBehaviour
             transform.forward = Vector3.Slerp(transform.forward, newPosition, Time.deltaTime * 15f);
             controller.Move(newPosition * moveSpeed * Time.deltaTime);
         }
+
         if (animator != null)
         {
             animator.SetFloat("Speed", newPosition.magnitude);
         }
     }
+
     void HandleJump(bool grounded)
     {
         if (grounded && velocity.y < 0f)
@@ -97,6 +99,7 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
+
         if (Input.GetKeyDown(KeyCode.LeftShift) && Time.time >= nextDashTime)
         {
             isDashing = true;
@@ -110,13 +113,15 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
     private void HandleDash()
     {
         if (dashTimer > 0f)
         {
             controller.Move(transform.forward * (dashSpeed * Time.deltaTime));
             dashTimer -= Time.deltaTime;
-        } else
+        } 
+        else
         {
             isDashing = false;
         }
@@ -126,14 +131,5 @@ public class PlayerController : MonoBehaviour
     {
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
-    }
-    void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        if (hit.gameObject.CompareTag("DashPickup"))
-        {
-            canDash = true;
-            Destroy(hit.gameObject);
-            Debug.Log("Dash Unlocked!");
-        }
     }
 }
