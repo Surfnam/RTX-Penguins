@@ -65,6 +65,7 @@ public class PlayerController : MonoBehaviour
     {
         float hor = Input.GetAxisRaw("Horizontal");
         float vert = Input.GetAxisRaw("Vertical");
+
         Vector3 newPosition = new Vector3(hor, 0f, vert).normalized;
 
         if (newPosition.magnitude >= 0.1f)
