@@ -48,16 +48,22 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        bool grounded = controller.isGrounded;
+        if (grounded)
+        {
+            hasDoubleJumped = false;
+        }
+
+        HandleDashInput();
+
         if (isDashing)
         {
             HandleDash();
             return;
         }
 
-        bool grounded = controller.isGrounded;
         HandleMovement();
         HandleJump(grounded);
-        HandleDashInput();
         ApplyGravity(grounded);
     }
 
@@ -91,6 +97,11 @@ public class PlayerController : MonoBehaviour
         {
             velocity.y = Mathf.Sqrt(baseJumpHeight * -2f * gravity);
             if (animator != null) animator.SetTrigger("Jump");
+        } else if (canDoubleJump && !hasDoubleJumped)
+        {
+            hasDoubleJumped = true;
+            velocity.y = Mathf.Sqrt(baseJumpHeight * -2f * gravity);
+            if (animator != null) animator.SetTrigger("Jump");
         }
     }
 
@@ -106,6 +117,7 @@ public class PlayerController : MonoBehaviour
             isDashing = true;
             dashTimer = dashDuration;
             nextDashTime = Time.time + dashCooldown;
+
             velocity.y = 0f;
 
             if (animator != null)
