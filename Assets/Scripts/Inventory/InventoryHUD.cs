@@ -152,19 +152,18 @@ public class InventoryHUD : MonoBehaviour
         scaler.matchWidthOrHeight = 0.5f;
         canvas = canvasObject.transform;
 
-        float rowWidth = Inventory.SlotCount * SlotSize + (Inventory.SlotCount - 1) * SlotGap;
         for (int i = 0; i < Inventory.SlotCount; i++)
         {
-            slotViews[i] = BuildSlot(i, (SlotSize - rowWidth) / 2f + i * (SlotSize + SlotGap));
+            slotViews[i] = BuildSlot(i, -24f - SlotSize / 2f - (Inventory.SlotCount - 1 - i) * (SlotSize + SlotGap));
         }
 
         BuildCoins();
         BuildBoostBar();
         BuildPrompt();
 
-        Text hint = MakeText("Hint", canvas, 16, HintColor, TextAnchor.LowerLeft);
-        Place(hint.rectTransform, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(24f, 22f), new Vector2(200f, 44f));
-        hint.text = $"1 to {Inventory.SlotCount} select\n{inventory.useKey} use";
+        Text hint = MakeText("Hint", canvas, 16, HintColor, TextAnchor.LowerRight);
+        Place(hint.rectTransform, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-24f, 100f), new Vector2(392f, 20f));
+        hint.text = $"1 to {Inventory.SlotCount} select   {inventory.useKey} use";
     }
 
     private SlotView BuildSlot(int index, float x)
@@ -173,7 +172,7 @@ public class InventoryHUD : MonoBehaviour
 
         view.border = MakeImage("Slot", canvas, LineColor);
         view.root = view.border.rectTransform;
-        Place(view.root, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(x, 22f), new Vector2(SlotSize, SlotSize));
+        Place(view.root, new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(x, 22f), new Vector2(SlotSize, SlotSize));
 
         view.background = MakeImage("Background", view.root, EmptyColor);
         Fill(view.background.rectTransform, BorderWidth);
@@ -221,7 +220,7 @@ public class InventoryHUD : MonoBehaviour
         GameObject root = new GameObject("Boost", typeof(RectTransform));
         root.transform.SetParent(canvas, false);
         RectTransform rootRect = (RectTransform)root.transform;
-        Place(rootRect, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 112f), new Vector2(290f, 20f));
+        Place(rootRect, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-24f, 128f), new Vector2(290f, 20f));
         boostBar = root;
 
         Text label = MakeText("Label", rootRect, 16, TextColor, TextAnchor.MiddleLeft);
