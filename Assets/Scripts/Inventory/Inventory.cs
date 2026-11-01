@@ -31,6 +31,12 @@ public class Inventory : MonoBehaviour
     public int SelectedSlot { get; private set; }
 
     private readonly InventorySlot[] slots = new InventorySlot[SlotCount];
+    private PenguinMenuController menu;
+
+    private void Start()
+    {
+        menu = FindFirstObjectByType<PenguinMenuController>();
+    }
 
     private void OnEnable()
     {
@@ -44,6 +50,11 @@ public class Inventory : MonoBehaviour
 
     private void Update()
     {
+        if (menu != null && !menu.IsGameplayActive)
+        {
+            return;
+        }
+
         for (int i = 0; i < SlotCount; i++)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1 + i))
