@@ -72,6 +72,7 @@ public static class LevelRuntimeBootstrap
         Marker("Piece Marker 04 - Final Ascent", new Vector3(5f, 5.8f, 29f), piece, markers);
 
         CreateExit(new Vector3(0f, 6.45f, 42f), wall, goal, root.transform);
+        PlacePickups(Group("Inventory_Pickups", root.transform), Object.Instantiate);
         CreatePlayerAndCamera();
         new GameObject("Menu System", typeof(PenguinMenuController));
 
@@ -80,6 +81,31 @@ public static class LevelRuntimeBootstrap
         RenderSettings.fogMode = FogMode.ExponentialSquared;
         RenderSettings.fogDensity = 0.012f;
         RenderSettings.ambientLight = new Color(0.11f, 0.18f, 0.26f);
+    }
+
+    // Shared with LevelBuilder so SampleScene and the generated scene get the same pickups.
+    public static void PlacePickups(Transform parent, System.Func<GameObject, GameObject> spawn)
+    {
+        (string prefab, Vector3 position)[] pickups =
+        {
+            ("JumpPotionPickup", new Vector3(3.5f, 1.5f, -24f)),
+            ("CoinPickup", new Vector3(-3f, 1.9f, -15f)),
+            ("CoinPickup", new Vector3(2.5f, 2.4f, -10.5f)),
+            ("CoinPickup", new Vector3(-2.5f, 2.9f, -6f)),
+            ("CoinPickup", new Vector3(0f, 3.3f, 0f)),
+            ("ItemPickup", new Vector3(-8f, 3.3f, 8f)),
+            ("JumpPotionPickup", new Vector3(8f, 3.3f, 14f)),
+            ("CoinPickup", new Vector3(-8.5f, 4.9f, 12f)),
+            ("CoinPickup", new Vector3(0f, 4.5f, 25f)),
+            ("CoinPickup", new Vector3(0f, 6.7f, 33f)),
+        };
+
+        foreach ((string prefab, Vector3 position) in pickups)
+        {
+            GameObject pickup = spawn(Resources.Load<GameObject>($"Inventory/{prefab}"));
+            pickup.transform.SetParent(parent);
+            pickup.transform.position = position;
+        }
     }
 
     private static void CreatePlayerAndCamera()
@@ -91,7 +117,11 @@ public static class LevelRuntimeBootstrap
         Object.Destroy(player.GetComponent<CapsuleCollider>());
         player.GetComponent<Renderer>().sharedMaterial = playerMaterial;
         player.AddComponent<CharacterController>();
+        player.tag = "Player";
         player.AddComponent<PlayerController>();
+        player.AddComponent<Inventory>();
+        player.AddComponent<InventoryHUD>();
+        player.AddComponent<PlayerPuzzlePiece>();
 
         GameObject cameraObject = new GameObject("Main Camera");
         cameraObject.tag = "MainCamera";
@@ -137,8 +167,11 @@ public static class LevelRuntimeBootstrap
     {
         GameObject marker = Box(name, position, new Vector3(0.75f, 0.75f, 0.18f), material, parent);
         marker.transform.rotation = Quaternion.Euler(35f, 45f, 20f);
-        Object.Destroy(marker.GetComponent<Collider>());
+        BoxCollider trigger = marker.GetComponent<BoxCollider>();
+        trigger.isTrigger = true;
+        trigger.size = new Vector3(1.5f, 1.5f, 5f);
         marker.AddComponent<PuzzlePieceDisplay>();
+        marker.AddComponent<PuzzlePiece>();
     }
 
     private static GameObject Box(string name, Vector3 position, Vector3 scale, Material material, Transform parent)

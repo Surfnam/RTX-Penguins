@@ -131,6 +131,7 @@ public static class LevelBuilder
         PuzzleMarker("Piece Marker 04 - Final Ascent", new Vector3(5f, 5.8f, 29f), piece, markers);
 
         CreateExit(new Vector3(0f, 6.45f, 42f), wall, goal, root);
+        LevelRuntimeBootstrap.PlacePickups(NewGroup("Inventory_Pickups", root), prefab => (GameObject)PrefabUtility.InstantiatePrefab(prefab));
     }
 
     private static void CreateExit(Vector3 position, Material wall, Material goal, Transform parent)
@@ -156,7 +157,11 @@ public static class LevelBuilder
         CharacterController character = player.AddComponent<CharacterController>();
         character.height = 2f;
         character.radius = 0.5f;
+        player.tag = "Player";
         player.AddComponent<PlayerController>();
+        player.AddComponent<Inventory>();
+        player.AddComponent<InventoryHUD>();
+        player.AddComponent<PlayerPuzzlePiece>();
         Renderer renderer = player.GetComponent<Renderer>();
         renderer.sharedMaterial = GetMaterial("PlayerPlaceholder", new Color(0.04f, 0.05f, 0.07f), 0.25f, 0.1f);
 
@@ -215,8 +220,11 @@ public static class LevelBuilder
     {
         GameObject marker = Primitive(name, PrimitiveType.Cube, position, new Vector3(0.75f, 0.75f, 0.18f), material, parent);
         marker.transform.rotation = Quaternion.Euler(35f, 45f, 20f);
-        Object.DestroyImmediate(marker.GetComponent<Collider>());
+        BoxCollider trigger = marker.GetComponent<BoxCollider>();
+        trigger.isTrigger = true;
+        trigger.size = new Vector3(1.5f, 1.5f, 5f);
         marker.AddComponent<PuzzlePieceDisplay>();
+        marker.AddComponent<PuzzlePiece>();
 
         GameObject pedestal = Primitive($"{name} Pedestal", PrimitiveType.Cylinder, position - Vector3.up * 1.05f, new Vector3(1.4f, 0.15f, 1.4f), material, parent);
         Object.DestroyImmediate(pedestal.GetComponent<Collider>());
