@@ -192,10 +192,23 @@ public class PenguinMenuController : MonoBehaviour
             ? "You reached the sealed exit."
             : "A trap ended this attempt.", labelStyle);
         GUILayout.Space(30f);
-        if (GUILayout.Button(won ? "PLAY AGAIN" : "TRY AGAIN", buttonStyle, GUILayout.Height(60f)))
+
+        if (won)
         {
-            ReloadLevel();
+            if (GUILayout.Button("PLAY AGAIN", buttonStyle, GUILayout.Height(60f)))
+            {
+                ReloadLevel();
+            }
         }
+        else
+        {
+            // close menu and unpause to continue from checkpoint
+            if (GUILayout.Button("RETRY (CHECKPOINT)", buttonStyle, GUILayout.Height(60f)))
+            {
+                ApplyScreenState(ScreenState.Playing);
+            }
+        }
+        
         GUILayout.FlexibleSpace();
     }
 

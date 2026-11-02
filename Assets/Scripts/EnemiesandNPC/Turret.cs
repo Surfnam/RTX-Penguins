@@ -18,12 +18,26 @@ public class Turret : MonoBehaviour
 
         if (distance <= maxDistance)
         {
-            shootTimer += Time.deltaTime;
-
-            if (shootTimer >= secondsBetweenShots)
+            Vector3 direction = player.transform.position - transform.position;
+            
+            // check if there is a wall between turret and player
+            if (Physics.Raycast(transform.position, direction, out RaycastHit hit, maxDistance))
             {
-                shootBall();
-                shootTimer = 0f;
+                if (hit.collider.gameObject == player)
+                {
+                    shootTimer += Time.deltaTime;
+
+                    if (shootTimer >= secondsBetweenShots)
+                    {
+                        shootBall();
+                        shootTimer = 0f;
+                    }
+                }
+                else
+                {
+                    // reset timer if player hides behind a wall
+                    shootTimer = 0f;
+                }
             }
         }
         else
