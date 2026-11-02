@@ -116,7 +116,22 @@ public class Inventory : MonoBehaviour
 
     public void LoseCoins()
     {
-        coins -= Mathf.FloorToInt(coins * coinLossOnDeath);
+        int loss = Mathf.FloorToInt(coins * coinLossOnDeath);
+        
+        // force at least 1 coin lost if they have coins but calculation was 0
+        if (loss == 0 && coins > 0)
+        {
+            loss = 1;
+        }
+        
+        coins -= loss;
+        
+        // prevent negatives
+        if (coins < 0)
+        {
+            coins = 0;
+        }
+        
         OnChanged?.Invoke();
     }
 

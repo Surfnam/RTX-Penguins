@@ -33,6 +33,10 @@ public class PlayerController : MonoBehaviour
     public event Action OnPlayerDeath;
     public event Action OnPlayerRespawn;
 
+    // respawn and death variables
+    public Vector3 currentCheckpoint;
+    public float killZThreshold = -15f;
+
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
@@ -42,12 +46,20 @@ public class PlayerController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        // save starting point
+        currentCheckpoint = transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
+        // check if player fell off the map
+        if (transform.position.y < killZThreshold)
+        {
+            Die();
+        }
+
+        if (isDashing)
         bool grounded = controller.isGrounded;
 
         if (grounded && velocity.y < 0f)
@@ -109,7 +121,7 @@ public class PlayerController : MonoBehaviour
 
         return finalMoveVel;
     }
-
+    
     void HandleJump(bool grounded)
     {
         Vector3 finalVertVel = Vector3.zero;
@@ -178,5 +190,35 @@ public class PlayerController : MonoBehaviour
     private void ApplyGravity(bool grounded)
     {
         velocity.y += gravity * Time.deltaTime;
+        controller.Move(velocity * Time.deltaTime);
+    }
+    
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.gameObject.CompareTag("DashPickup"))
+        {
+            canDash = true;
+            Destroy(hit.gameObject);
+            Debug.Log("Dash Unlocked!");
+        }
+    }
+
+    public void Die()
+    {
+        // trigger death event so inventory drops coins
+        OnPlayerDeath?.Invoke();
+
+        // need to disable controller before teleporting
+        controller.enabled = false;
+        transform.position = currentCheckpoint;
+        controller.enabled = true;
+
+        // fire respawn event
+        OnPlayerRespawn?.Invoke();
+    }
+
+    public void SetCheckpoint(Vector3 newPosition)
+    {
+        currentCheckpoint = newPosition;
     }
 }
