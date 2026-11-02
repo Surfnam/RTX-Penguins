@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
             hasDoubleJumped = false;
         }
 
-        HandleDashInput();
+        Vector3 dashVelocity = HandleDashInput();
 
         if (isDashing)
         {
@@ -62,76 +62,89 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        HandleMovement();
-        HandleJump(grounded);
-        ApplyGravity(grounded);
+        Vector3 wasdVelocity = HandleMovement();
+        Vector3 verticalVelocity = HandleJump(grounded);
+        Vector3 gravVelocity = ApplyGravity(grounded);
+
+        Vector3 finalVelocity = dashVelocity + wasdVelocity + verticalVelocity + gravVelocity;
+        controller.Move(finalVelocity * Time.deltaTime);
     }
 
-    void HandleMovement()
+    Vector3 HandleMovement()
     {
         float hor = Input.GetAxisRaw("Horizontal");
         float vert = Input.GetAxisRaw("Vertical");
 
+        Vector3 finalMoveVel = new Vector3(0, 0, 0);
         Vector3 newPosition = new Vector3(hor, 0f, vert).normalized;
 
         if (newPosition.magnitude >= 0.1f)
         {
             transform.forward = Vector3.Slerp(transform.forward, newPosition, Time.deltaTime * 15f);
-            controller.Move(newPosition * moveSpeed * Time.deltaTime);
+            finalMoveVel = newPosition * moveSpeed;
         }
 
         if (animator != null)
         {
             animator.SetFloat("Speed", newPosition.magnitude);
         }
+
+        return finalMoveVel;
     }
 
-    void HandleJump(bool grounded)
+    Vector3 HandleJump(bool grounded)
     {
+        Vector3 finalVertVel = Vector3.zero;
         if (grounded && velocity.y < 0f)
         {
-            velocity.y = -2f;
+            finalVertVel.y = -2f;
         }
 
-        if (Input.GetButtonDown("Jump") && controller.isGrounded)
+        if (Input.GetButtonDown("Jump"))
         {
-            velocity.y = Mathf.Sqrt(baseJumpHeight * -2f * gravity);
-            if (animator != null) animator.SetTrigger("Jump");
-        } else if (canDoubleJump && !hasDoubleJumped)
-        {
-            hasDoubleJumped = true;
-            velocity.y = Mathf.Sqrt(baseJumpHeight * -2f * gravity);
-            if (animator != null) animator.SetTrigger("Jump");
+            if (grounded)
+            {
+                finalVertVel.y = Mathf.Sqrt(baseJumpHeight * -2f * gravity);
+                if (animator != null) animator.SetTrigger("Jump");
+                Debug.Log("i am able to jump");
+            }
+            else if (canDoubleJump && !hasDoubleJumped)
+            {
+                hasDoubleJumped = true;
+                finalVertVel.y = Mathf.Sqrt(baseJumpHeight * -2f * gravity);
+                if (animator != null) animator.SetTrigger("Jump");
+            }
         }
+
+        return finalVertVel;
+
     }
 
-    private void HandleDashInput()
+    private Vector3 HandleDashInput()
     {
-        if (!canDash)
-        {
-            return;
-        }
-
+        Vector3 finalDashVel = new Vector3(0, -2, 0);
+        
         if (Input.GetKeyDown(KeyCode.LeftShift) && Time.time >= nextDashTime)
         {
             isDashing = true;
             dashTimer = dashDuration;
             nextDashTime = Time.time + dashCooldown;
 
-            velocity.y = 0f;
+            finalDashVel.y = 0f;
 
             if (animator != null)
             {
                 animator.SetTrigger("Dash");
             }
         }
+
+        return finalDashVel;
     }
 
     private void HandleDash()
     {
         if (dashTimer > 0f)
         {
-            controller.Move(transform.forward * (dashSpeed * Time.deltaTime));
             dashTimer -= Time.deltaTime;
         } 
         else
@@ -140,9 +153,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void ApplyGravity(bool grounded)
+    private Vector3 ApplyGravity(bool grounded)
     {
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+        Vector3 finalGravVel = Vector3.zero;
+        finalGravVel.y += gravity * Time.deltaTime;
+
+        return finalGravVel;
     }
 }
