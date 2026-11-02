@@ -59,7 +59,6 @@ public class PlayerController : MonoBehaviour
             Die();
         }
 
-        if (isDashing)
         bool grounded = controller.isGrounded;
 
         if (grounded && velocity.y < 0f)
@@ -70,11 +69,11 @@ public class PlayerController : MonoBehaviour
 
         Vector3 finalVelocity = Vector3.zero;
         
-
         if (isDashing)
         {
             finalVelocity = HandleDash();
-        } else
+        } 
+        else
         {
             HandleDashInput();
 
@@ -84,7 +83,7 @@ public class PlayerController : MonoBehaviour
 
             finalVelocity = wasdVelocity + velocity;
 
-            Transform visualMeshChild = transform.GetChild(3);
+            Transform visualMeshChild = transform.GetChild(1);
 
             if (wasdVelocity.magnitude > 0.1f)
             {

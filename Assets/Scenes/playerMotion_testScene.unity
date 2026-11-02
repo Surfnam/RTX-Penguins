@@ -1040,6 +1040,8 @@ MonoBehaviour:
   dashSpeed: 20
   dashDuration: 0.2
   dashCooldown: 1
+  currentCheckpoint: {x: 0, y: 0, z: 0}
+  killZThreshold: -15
 --- !u!114 &636130096
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1647,7 +1649,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 6c2712766294cb241a40a4ccd799c72f, type: 3}
       propertyPath: m_LocalScale.x
-      value: 100
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6c2712766294cb241a40a4ccd799c72f, type: 3}
       propertyPath: m_LocalScale.y
@@ -1655,7 +1657,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6c2712766294cb241a40a4ccd799c72f, type: 3}
       propertyPath: m_LocalScale.z
-      value: 100
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6c2712766294cb241a40a4ccd799c72f, type: 3}
       propertyPath: m_LocalPosition.x

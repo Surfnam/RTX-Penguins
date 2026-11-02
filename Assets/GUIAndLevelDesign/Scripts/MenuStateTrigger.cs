@@ -1,10 +1,6 @@
 using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// A small handoff point between level geometry and the menu UI.
-/// It deliberately does not implement player health, checkpoints, or inventory loss.
-/// </summary>
 [RequireComponent(typeof(Collider))]
 public class MenuStateTrigger : MonoBehaviour
 {
@@ -20,7 +16,8 @@ public class MenuStateTrigger : MonoBehaviour
     public int requiredPieces = 4;
 
     private bool triggered;
-    
+    private Collider gate;
+
     // popup variables
     private int missingPiecesCount = 0;
     private float textAlpha = 0f;
@@ -42,6 +39,8 @@ public class MenuStateTrigger : MonoBehaviour
             fontStyle = FontStyle.Bold,
             normal = { textColor = new Color32(25, 242, 102, 255) } 
         };
+
+        gate = GetComponents<Collider>()[1];
     }
 
     private void Reset()
@@ -69,6 +68,9 @@ public class MenuStateTrigger : MonoBehaviour
                 StopAllCoroutines();
                 StartCoroutine(FadeSequence());
                 return;
+            } else
+            {
+                gate.isTrigger = true; // allow the gate to be passed thru if enough pieces
             }
         }
 

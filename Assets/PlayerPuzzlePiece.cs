@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerPuzzlePiece : MonoBehaviour
@@ -9,13 +10,28 @@ public class PlayerPuzzlePiece : MonoBehaviour
         collectedPieces.Add(piece);
     }
 
+    public List<PuzzlePiece> getCollectedPieces()
+    {
+        return collectedPieces;
+    }
+
+    public void SaveCollectedPieces()
+    {
+        foreach (var piece in collectedPieces)
+        {
+            piece.SetSavedAtCheckpoint();
+        }
+    }
+
     public int GetPieceCount() {
         return collectedPieces.Count;
     }
 
     // safely empty the list on death without destroying the physical items
-    public void ClearPieces() {
-        collectedPieces.Clear();
+    public void ClearPieces() 
+    {
+        collectedPieces.RemoveAll(piece => !piece.savedAtCheckpoint);
+        // collectedPieces.Clear();
     }
 
     public void ClearInventory() {
