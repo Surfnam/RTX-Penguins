@@ -4,6 +4,10 @@ public class PuzzlePiece : MonoBehaviour
 {
     private Transform playerTransform;
     private bool isCollected = false;
+    
+    // original spot and player tracking
+    private Vector3 startPosition;
+    private PlayerController activePlayer;
 
     [Header("Orbit Settings")]
     public float orbitRadius = 2.0f;
@@ -17,6 +21,8 @@ public class PuzzlePiece : MonoBehaviour
     private void Start()
     {
         orbitAngle = Random.Range(0f, 360f);
+        // save original spot
+        startPosition = transform.position;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -31,6 +37,13 @@ public class PuzzlePiece : MonoBehaviour
         isCollected = true;
         playerTransform = player;
         startYOffset = transform.position.y - playerTransform.position.y;
+        
+        // listen for death to reset piece
+        activePlayer = player.GetComponent<PlayerController>();
+        if (activePlayer != null) {
+            activePlayer.OnPlayerDeath += ResetPiece;
+        }
+
         Animator animator = GetComponent<Animator>();
         if (animator != null){
             animator.enabled = false;
@@ -44,6 +57,36 @@ public class PuzzlePiece : MonoBehaviour
         if (inventory != null) {
             inventory.AddPiece(this);
         }
+    }
+
+    private void ResetPiece()
+    {
+        isCollected = false;
+        transform.position = startPosition;
+
+        // stop listening to prevent memory leaks
+        if (activePlayer != null) {
+            activePlayer.OnPlayerDeath -= ResetPiece;
+            activePlayer = null;
+        }
+
+        // turn visuals back on
+        Animator animator = GetComponent<Animator>();
+        if (animator != null) {
+            animator.enabled = true;
+        }
+        PuzzlePieceDisplay display = GetComponent<PuzzlePieceDisplay>();
+        if (display != null) {
+            display.enabled = true;
+        }
+
+        // tell player to drop this piece
+        PlayerPuzzlePiece inventory = playerTransform.GetComponent<PlayerPuzzlePiece>();
+        if (inventory != null) {
+            inventory.SendMessage("ClearPieces", SendMessageOptions.DontRequireReceiver);
+        }
+        
+        playerTransform = null;
     }
 
     private void Update()

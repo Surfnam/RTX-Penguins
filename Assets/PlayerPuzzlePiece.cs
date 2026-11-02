@@ -13,11 +13,15 @@ public class PlayerPuzzlePiece : MonoBehaviour
         return collectedPieces.Count;
     }
 
+    // safely empty the list on death without destroying the physical items
+    public void ClearPieces() {
+        collectedPieces.Clear();
+    }
+
     public void ClearInventory() {
         foreach (var piece in collectedPieces) {
             Destroy(piece.gameObject);
         }
         collectedPieces.Clear();
     }
-
 }
