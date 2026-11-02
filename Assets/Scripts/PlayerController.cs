@@ -49,24 +49,31 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         bool grounded = controller.isGrounded;
-        if (grounded)
+
+        if (grounded && velocity.y < 0f)
         {
+            velocity.y = -2f;
             hasDoubleJumped = false;
         }
 
-        Vector3 dashVelocity = HandleDashInput();
+        Vector3 finalVelocity = Vector3.zero;
+        
 
         if (isDashing)
         {
-            HandleDash();
-            return;
+            finalVelocity = HandleDash();
+        } else
+        {
+            HandleDashInput();
+
+            Vector3 wasdVelocity = HandleMovement();
+            HandleJump(grounded);
+            ApplyGravity(grounded);
+
+            finalVelocity = wasdVelocity + velocity;
         }
 
-        Vector3 wasdVelocity = HandleMovement();
-        Vector3 verticalVelocity = HandleJump(grounded);
-        Vector3 gravVelocity = ApplyGravity(grounded);
-
-        Vector3 finalVelocity = dashVelocity + wasdVelocity + verticalVelocity + gravVelocity;
+            
         controller.Move(finalVelocity * Time.deltaTime);
     }
 
@@ -92,72 +99,73 @@ public class PlayerController : MonoBehaviour
         return finalMoveVel;
     }
 
-    Vector3 HandleJump(bool grounded)
+    void HandleJump(bool grounded)
     {
         Vector3 finalVertVel = Vector3.zero;
+
         if (grounded && velocity.y < 0f)
         {
-            finalVertVel.y = -2f;
+            velocity.y = -2f;
         }
 
         if (Input.GetButtonDown("Jump"))
         {
             if (grounded)
             {
-                finalVertVel.y = Mathf.Sqrt(baseJumpHeight * -2f * gravity);
+                velocity.y = Mathf.Sqrt(baseJumpHeight * -2f * gravity);
                 if (animator != null) animator.SetTrigger("Jump");
                 Debug.Log("i am able to jump");
             }
             else if (canDoubleJump && !hasDoubleJumped)
             {
                 hasDoubleJumped = true;
-                finalVertVel.y = Mathf.Sqrt(baseJumpHeight * -2f * gravity);
+                velocity.y = Mathf.Sqrt(baseJumpHeight * -2f * gravity);
                 if (animator != null) animator.SetTrigger("Jump");
             }
         }
-
-        return finalVertVel;
-
     }
 
-    private Vector3 HandleDashInput()
+    private void HandleDashInput()
     {
-        Vector3 finalDashVel = new Vector3(0, -2, 0);
-        
+        if (!canDash)
+        {
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.LeftShift) && Time.time >= nextDashTime)
         {
             isDashing = true;
             dashTimer = dashDuration;
             nextDashTime = Time.time + dashCooldown;
 
-            finalDashVel.y = 0f;
+            velocity.y = 0f;
 
             if (animator != null)
             {
                 animator.SetTrigger("Dash");
             }
         }
-
-        return finalDashVel;
     }
 
-    private void HandleDash()
+    private Vector3 HandleDash()
     {
+        Vector3 dashVel = Vector3.zero;
+
         if (dashTimer > 0f)
         {
+            dashVel = transform.forward * dashSpeed;
             dashTimer -= Time.deltaTime;
         } 
         else
         {
             isDashing = false;
         }
+
+        return dashVel;
     }
 
-    private Vector3 ApplyGravity(bool grounded)
+    private void ApplyGravity(bool grounded)
     {
-        Vector3 finalGravVel = Vector3.zero;
-        finalGravVel.y += gravity * Time.deltaTime;
-
-        return finalGravVel;
+        velocity.y += gravity * Time.deltaTime;
     }
 }
