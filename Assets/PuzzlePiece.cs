@@ -35,6 +35,10 @@ public class PuzzlePiece : MonoBehaviour
         if (animator != null){
             animator.enabled = false;
         }
+        PuzzlePieceDisplay display = GetComponent<PuzzlePieceDisplay>();
+        if (display != null) {
+            display.enabled = false;
+        }
         transform.SetParent(null);
         PlayerPuzzlePiece inventory = player.GetComponent<PlayerPuzzlePiece>();
         if (inventory != null) {
