@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -107,6 +107,7 @@ public class PlayerController : MonoBehaviour
         if (animator != null)
         {
             animator.SetFloat("Speed", newPosition.magnitude);
+            Debug.Log("new speed: " + newPosition.magnitude);
         }
 
         return finalMoveVel;

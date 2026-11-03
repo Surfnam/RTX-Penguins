@@ -1569,6 +1569,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: labyrinth_escapee
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 6c2712766294cb241a40a4ccd799c72f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 6c2712766294cb241a40a4ccd799c72f, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: f6064efec2c46a643a6a49c6ee75c3f8, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6643,7 +6651,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78caf35ed113db64780257b8d138b25b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 0}
+  animator: {fileID: 1947066325}
   moveSpeed: 7
   canCrouch: 0
   canDoubleJump: 0
@@ -6767,6 +6775,11 @@ MeshFilter:
 --- !u!4 &1947066324 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6c2712766294cb241a40a4ccd799c72f, type: 3}
+  m_PrefabInstance: {fileID: 392812239}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1947066325 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 6c2712766294cb241a40a4ccd799c72f, type: 3}
   m_PrefabInstance: {fileID: 392812239}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1988613320
