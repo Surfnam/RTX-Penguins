@@ -241,7 +241,6 @@ public class PenguinMenuController : MonoBehaviour
         if (player != null)
         {
             player.canDash = true;
-            player.ResetPosition();
 
             PlayerPuzzlePiece inventory = player.GetComponent<PlayerPuzzlePiece>();
             if (inventory != null)
@@ -249,8 +248,6 @@ public class PenguinMenuController : MonoBehaviour
                 inventory.ClearInventory();
             }
         }
-
-        LevelRuntimeBootstrap.ResetLevelWithAbilities();
 
         ApplyScreenState(ScreenState.Playing);
     }

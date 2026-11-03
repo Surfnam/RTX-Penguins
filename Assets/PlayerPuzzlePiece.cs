@@ -31,7 +31,6 @@ public class PlayerPuzzlePiece : MonoBehaviour
     public void ClearPieces() 
     {
         collectedPieces.RemoveAll(piece => !piece.savedAtCheckpoint);
-        // collectedPieces.Clear();
     }
 
     public void ClearInventory() {

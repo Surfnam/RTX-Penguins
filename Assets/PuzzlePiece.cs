@@ -73,6 +73,12 @@ public class PuzzlePiece : MonoBehaviour
 
     private void ResetPiece()
     {
+        // do not attempt removing a piece if there are no puzzle pieces
+        if (this == null || gameObject == null || playerTransform == null)
+        {
+            return;
+        }
+
         // do not remove a piece if saved at checkpoint
         if (savedAtCheckpoint)
         {
