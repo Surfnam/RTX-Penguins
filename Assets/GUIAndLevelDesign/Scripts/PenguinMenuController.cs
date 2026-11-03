@@ -195,6 +195,13 @@ public class PenguinMenuController : MonoBehaviour
             {
                 ReloadLevel();
             }
+
+            GUILayout.Space(10f);
+
+            if (GUILayout.Button("CONTINUE WITH DASH", buttonStyle, GUILayout.Height(50f)))
+            {
+                ContinueLevel();
+            }
         }
         else
         {
@@ -226,7 +233,29 @@ public class PenguinMenuController : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    private void ApplyScreenState(ScreenState state)
+    private void ContinueLevel()
+    {
+        // unlock dash upon completion of level
+        PlayerController player = FindFirstObjectByType<PlayerController>();
+
+        if (player != null)
+        {
+            player.canDash = true;
+            player.ResetPosition();
+
+            PlayerPuzzlePiece inventory = player.GetComponent<PlayerPuzzlePiece>();
+            if (inventory != null)
+            {
+                inventory.ClearInventory();
+            }
+        }
+
+        LevelRuntimeBootstrap.ResetLevelWithAbilities();
+
+        ApplyScreenState(ScreenState.Playing);
+    }
+
+    public void ApplyScreenState(ScreenState state)
     {
         currentScreen = state;
         bool gameplay = state == ScreenState.Playing;

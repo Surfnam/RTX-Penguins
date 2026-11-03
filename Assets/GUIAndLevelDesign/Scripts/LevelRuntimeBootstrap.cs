@@ -1,11 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Makes the GUI and level-design scene playable from the repository's default SampleScene even
-/// before the editor-only scene generator has been run. The generated scene
-/// remains the preferred handoff asset once Unity is available.
-/// </summary>
 public static class LevelRuntimeBootstrap
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -198,5 +193,46 @@ public static class LevelRuntimeBootstrap
         Material material = new Material(shader) { name = name, color = color };
         if (material.HasProperty("_Smoothness")) material.SetFloat("_Smoothness", smoothness);
         return material;
+    }
+
+    public static void ResetLevelWithAbilities()
+    {
+        PlayerController player = Object.FindFirstObjectByType<PlayerController>();
+        bool canDash = (player != null && player.canDash);
+
+        if (player != null)
+        {
+            player.ResetPosition();
+            PlayerPuzzlePiece inventory = player.GetComponent<PlayerPuzzlePiece>();
+            if (inventory != null)
+            {
+                inventory.ClearInventory();
+            }
+        }
+
+        PuzzlePiece[] pieces = Object.FindObjectsByType<PuzzlePiece>(FindObjectsSortMode.None);
+
+        foreach (var piece in pieces)
+        {
+            piece.gameObject.SetActive(true);
+        }
+
+        MenuStateTrigger[] triggers = Object.FindObjectsByType<MenuStateTrigger>(FindObjectsSortMode.None);
+        foreach (var trigger in triggers)
+        {
+            if (trigger.TriggerResult == MenuStateTrigger.Result.Win)
+            {
+                foreach (Collider col in trigger.GetComponents<Collider>())
+                {
+                    if (!col.isTrigger) col.isTrigger = false;
+                }
+            }
+        }
+
+        PenguinMenuController menu = Object.FindFirstObjectByType<PenguinMenuController>();
+        if (menu != null)
+        {
+            menu.ApplyScreenState(PenguinMenuController.ScreenState.Playing);
+        }
     }
 }

@@ -85,18 +85,6 @@ public class PlayerController : MonoBehaviour
             ApplyGravity(grounded);
 
             finalVelocity = wasdVelocity + velocity;
-
-            Transform visualMeshChild = transform.GetChild(1);
-
-            if (wasdVelocity.magnitude > 0.1f)
-            {
-                float runningWobble = Mathf.Sin(Time.time * 12f) * 8f;
-                visualMeshChild.localRotation = Quaternion.Euler(0f, 0f, runningWobble);
-            }
-            else
-            {
-                visualMeshChild.localRotation = Quaternion.Slerp(visualMeshChild.localRotation, Quaternion.identity, Time.deltaTime * 10f);
-            }
         }
 
         controller.Move(finalVelocity * Time.deltaTime);
