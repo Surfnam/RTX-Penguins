@@ -1,10 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Owns the level's start, pause/settings, win, and lose overlays.
-/// Gameplay systems can call ShowWin or ShowLose without depending on UI details.
-/// </summary>
 public class PenguinMenuController : MonoBehaviour
 {
     public enum ScreenState

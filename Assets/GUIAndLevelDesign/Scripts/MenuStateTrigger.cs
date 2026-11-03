@@ -40,7 +40,14 @@ public class MenuStateTrigger : MonoBehaviour
             normal = { textColor = new Color32(25, 242, 102, 255) } 
         };
 
-        gate = GetComponents<Collider>()[1];
+        foreach (Collider col in GetComponents<Collider>())
+        {
+            if (!col.isTrigger)
+            {
+                gate = col;
+                break;
+            }
+        }
     }
 
     private void Reset()
@@ -71,6 +78,15 @@ public class MenuStateTrigger : MonoBehaviour
             } else
             {
                 gate.isTrigger = true; // allow the gate to be passed thru if enough pieces
+
+                // unlock dash upon completion of level
+                PlayerController player = other.GetComponent<PlayerController>();
+
+                if (player != null)
+                {
+                    player.canDash = true;
+                    player.ResetPosition();
+                }
             }
         }
 

@@ -8,19 +8,20 @@ public class PlayerController : MonoBehaviour
     public Animator animator;
 
     // movement variables
+    [Header("Movement Variables")]
     public float moveSpeed = 7f;
     private Vector3 velocity;
 
-    // crouch variables
+    [Header("Crouch Variables")]
     public bool canCrouch = false;
 
-    // jump variables
+    [Header("Jump Variables")]
     public bool canDoubleJump = false;
     public float baseJumpHeight = 2.2f;
     public float gravity = -20f;
     private bool hasDoubleJumped;
 
-    // dash variables
+    [Header("Dash Variables")]
     public bool canDash = false;
     private bool isDashing;
     public float dashSpeed = 20f;
@@ -35,6 +36,7 @@ public class PlayerController : MonoBehaviour
 
     // respawn and death variables
     public Vector3 currentCheckpoint;
+    public Vector3 startPoint;
     public float killZThreshold = -15f;
 
     private void Awake()
@@ -46,7 +48,8 @@ public class PlayerController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        // save starting point
+        // save starting point and checkpoint
+        startPoint = transform.position;
         currentCheckpoint = transform.position;
     }
 
@@ -214,6 +217,13 @@ public class PlayerController : MonoBehaviour
 
         // fire respawn event
         OnPlayerRespawn?.Invoke();
+    }
+
+    public void ResetPosition()
+    {
+        controller.enabled = false;
+        transform.position = startPoint;
+        controller.enabled = true;
     }
 
     public void SetCheckpoint(Vector3 newPosition)
