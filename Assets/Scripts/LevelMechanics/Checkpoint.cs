@@ -33,6 +33,9 @@ public class Checkpoint : MonoBehaviour
             // set new respawn point to the center of this pad
             other.GetComponent<PlayerController>()?.SetCheckpoint(transform.position);
 
+            // save currently collected puzzle pieces
+            other.GetComponent<PlayerPuzzlePiece>()?.SaveCollectedPieces();
+
             // change visual to show it is active
             if (visualRenderer != null && activeMaterial != null)
             {

@@ -1,11 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Makes the GUI and level-design scene playable from the repository's default SampleScene even
-/// before the editor-only scene generator has been run. The generated scene
-/// remains the preferred handoff asset once Unity is available.
-/// </summary>
 public static class LevelRuntimeBootstrap
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]

@@ -1,10 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Owns the level's start, pause/settings, win, and lose overlays.
-/// Gameplay systems can call ShowWin or ShowLose without depending on UI details.
-/// </summary>
 public class PenguinMenuController : MonoBehaviour
 {
     public enum ScreenState
@@ -199,6 +195,13 @@ public class PenguinMenuController : MonoBehaviour
             {
                 ReloadLevel();
             }
+
+            GUILayout.Space(10f);
+
+            if (GUILayout.Button("CONTINUE WITH DASH", buttonStyle, GUILayout.Height(50f)))
+            {
+                ContinueLevel();
+            }
         }
         else
         {
@@ -230,7 +233,26 @@ public class PenguinMenuController : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    private void ApplyScreenState(ScreenState state)
+    private void ContinueLevel()
+    {
+        // unlock dash upon completion of level
+        PlayerController player = FindFirstObjectByType<PlayerController>();
+
+        if (player != null)
+        {
+            player.canDash = true;
+
+            PlayerPuzzlePiece inventory = player.GetComponent<PlayerPuzzlePiece>();
+            if (inventory != null)
+            {
+                inventory.ClearInventory();
+            }
+        }
+
+        ApplyScreenState(ScreenState.Playing);
+    }
+
+    public void ApplyScreenState(ScreenState state)
     {
         currentScreen = state;
         bool gameplay = state == ScreenState.Playing;
