@@ -40,6 +40,13 @@ public static class InventorySelfCheck
             boost.Cancel();
             Check(player.baseJumpHeight == normalJump, "death cancels the boost");
 
+            inventory.AddCoins(10);
+            Check(inventory.TryPurchase(Potion(1), 10), "potion purchase succeeds with enough coins and room");
+            Check(inventory.coins == 0 && inventory.GetSlot(0).count == 1, "potion purchase charges coins and adds the potion");
+            Check(!inventory.TryPurchase(Potion(1), 10), "purchase fails when coins are insufficient");
+            Check(inventory.coins == 0 && inventory.GetSlot(0).count == 1, "failed purchase does not charge coins or add a potion");
+            inventory.UseSelectedSlot();
+
             Check(inventory.TryAdd(Item(2)), "item fits");
             Check(inventory.GetSlot(0) != null && !inventory.GetSlot(0).isConsumable, "item takes first empty slot");
             inventory.UseSelectedSlot();
@@ -53,10 +60,14 @@ public static class InventorySelfCheck
             }
             Check(!inventory.TryAdd(Item(3)), "full inventory refuses an item");
             Check(!inventory.TryAdd(Potion(1)), "full inventory refuses a new potion");
+            inventory.AddCoins(10);
+            Check(!inventory.TryPurchase(Potion(1), 10), "purchase fails when inventory is full");
+            Check(inventory.coins == 10, "full inventory purchase does not charge coins");
 
             inventory.SelectSlot(4);
             Check(inventory.SelectedSlot == 4, "selects a slot");
 
+            inventory.coins = 0;
             inventory.AddCoins(10);
             inventory.LoseCoins();
             Check(inventory.coins == 8, "death takes a quarter of the coins, rounded down");
