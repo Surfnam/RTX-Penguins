@@ -1,8 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Visual-only marker for Aryan's eventual puzzle-piece system.
-/// </summary>
 public class PuzzlePieceDisplay : MonoBehaviour
 {
     [SerializeField] private float spinSpeed = 55f;

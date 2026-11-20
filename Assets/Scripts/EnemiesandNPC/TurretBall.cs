@@ -31,6 +31,13 @@ public class TurretBall : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             // We will add damage here later.
+            // kill player instantly
+            other.GetComponent<PlayerController>()?.Die();
+            Destroy(gameObject);
+        }
+        else if (!other.isTrigger)
+        {
+            // destroy ball if it hits a solid wall or floor
             Destroy(gameObject);
         }
     }

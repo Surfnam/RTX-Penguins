@@ -1,10 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Owns the level's start, pause/settings, win, and lose overlays.
-/// Gameplay systems can call ShowWin or ShowLose without depending on UI details.
-/// </summary>
 public class PenguinMenuController : MonoBehaviour
 {
     public enum ScreenState
@@ -192,10 +188,30 @@ public class PenguinMenuController : MonoBehaviour
             ? "You reached the sealed exit."
             : "A trap ended this attempt.", labelStyle);
         GUILayout.Space(30f);
-        if (GUILayout.Button(won ? "PLAY AGAIN" : "TRY AGAIN", buttonStyle, GUILayout.Height(60f)))
+
+        if (won)
         {
-            ReloadLevel();
+            if (GUILayout.Button("PLAY AGAIN", buttonStyle, GUILayout.Height(60f)))
+            {
+                ReloadLevel();
+            }
+
+            GUILayout.Space(10f);
+
+            if (GUILayout.Button("CONTINUE WITH DASH", buttonStyle, GUILayout.Height(50f)))
+            {
+                ContinueLevel();
+            }
         }
+        else
+        {
+            // close menu and unpause to continue from checkpoint
+            if (GUILayout.Button("RETRY (CHECKPOINT)", buttonStyle, GUILayout.Height(60f)))
+            {
+                ApplyScreenState(ScreenState.Playing);
+            }
+        }
+        
         GUILayout.FlexibleSpace();
     }
 
@@ -217,7 +233,26 @@ public class PenguinMenuController : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    private void ApplyScreenState(ScreenState state)
+    private void ContinueLevel()
+    {
+        // unlock dash upon completion of level
+        PlayerController player = FindFirstObjectByType<PlayerController>();
+
+        if (player != null)
+        {
+            player.canDash = true;
+
+            PlayerPuzzlePiece inventory = player.GetComponent<PlayerPuzzlePiece>();
+            if (inventory != null)
+            {
+                inventory.ClearInventory();
+            }
+        }
+
+        ApplyScreenState(ScreenState.Playing);
+    }
+
+    public void ApplyScreenState(ScreenState state)
     {
         currentScreen = state;
         bool gameplay = state == ScreenState.Playing;

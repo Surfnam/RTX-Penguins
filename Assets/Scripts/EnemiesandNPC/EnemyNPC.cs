@@ -77,6 +77,8 @@ public class EnemyNPC : MonoBehaviour
     void hitPlayer()
     {
         // We will add damage here later.
+        // kill player instantly
+        player.GetComponent<PlayerController>()?.Die();
 
         bouncing = true;
 
