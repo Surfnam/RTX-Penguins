@@ -39,6 +39,9 @@ public class PlayerController : MonoBehaviour
     public Vector3 startPoint;
     public float killZThreshold = -15f;
 
+    //NPC dialogue
+    public bool isInDialogue = false;
+
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
@@ -56,6 +59,12 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //Checking if the player is in dialogue
+        if (isInDialogue)
+        {
+            return;
+        }
+
         // check if player fell off the map
         if (transform.position.y < killZThreshold)
         {
@@ -68,6 +77,14 @@ public class PlayerController : MonoBehaviour
         {
             velocity.y = -2f;
             hasDoubleJumped = false;
+        }
+
+        if (isInDialogue){
+            if (animator != null){
+                animator.SetFloat("Speed", 0f);
+            }
+
+            return;
         }
 
         Vector3 finalVelocity = Vector3.zero;

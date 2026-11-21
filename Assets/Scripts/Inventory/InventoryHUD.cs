@@ -127,6 +127,30 @@ public class InventoryHUD : MonoBehaviour
 
     private void UpdatePrompt()
     {
+        LoreNPC[] npcs = FindObjectsByType<LoreNPC>(FindObjectsSortMode.None);
+        foreach (LoreNPC npc in npcs){
+            if (npc.IsPlayerNear){
+                if (npc.IsTalking){
+                    prompt.gameObject.SetActive(false);
+                    return;
+                }
+                Camera camera = Camera.main;
+                if (camera != null){
+                    Vector3 npcScreen = camera.WorldToScreenPoint(npc.transform.position + Vector3.up * 2f);
+                    prompt.gameObject.SetActive(npcScreen.z > 0f);
+                    if (npcScreen.z > 0f){
+                        prompt.position = npcScreen;
+                        promptChip.SetActive(true);
+                        promptKey.text = "E";
+                        promptLabel.text = "Talk";
+                    }
+                }
+                else{
+                    prompt.gameObject.SetActive(false);
+                }
+                return;
+            }
+        }
         Pickup pickup = inventory.FindNearbyPickup();
         Camera view = Camera.main;
         Vector3 screen = pickup != null && view != null ? view.WorldToScreenPoint(pickup.transform.position + Vector3.up) : Vector3.back;

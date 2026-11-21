@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,9 +9,11 @@ public class EnemyNPC : MonoBehaviour
 
     public GameObject player;
 
+    [Header("Movement Settings")]
     public Vector3 areaCenter;
     public Vector3 areaSize = new Vector3(10f, 5f, 10f);
 
+    [Header("Attack Settings")]
     public float damage = 10f;
     public float bounceDistance = 2f;
     public float captureDistance = 1f;
@@ -20,13 +23,23 @@ public class EnemyNPC : MonoBehaviour
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
+
+        // Center the enemy's area around its starting position.
+        areaCenter = transform.position;
     }
 
     void Update()
     {
+        if (player == null || !navMeshAgent.isActiveAndEnabled || !navMeshAgent.isOnNavMesh)
+        {
+            return;
+        }
+
         if (bouncing)
         {
-            if (!navMeshAgent.pathPending && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+            if (!navMeshAgent.pathPending &&
+                (!navMeshAgent.hasPath ||
+                 navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance))
             {
                 bouncing = false;
             }
@@ -36,7 +49,18 @@ public class EnemyNPC : MonoBehaviour
             Vector3 destination = player.transform.position;
             destination = keepInArea(destination);
 
-            navMeshAgent.SetDestination(destination);
+            NavMeshHit hit;
+
+            if (NavMesh.SamplePosition(destination, out hit, 2f, NavMesh.AllAreas))
+            {
+                NavMeshPath path = new NavMeshPath();
+
+                if (navMeshAgent.CalculatePath(hit.position, path) &&
+                    path.status == NavMeshPathStatus.PathComplete)
+                {
+                    navMeshAgent.SetDestination(hit.position);
+                }
+            }
 
             float distance = Vector3.Distance(transform.position, player.transform.position);
 
@@ -76,8 +100,7 @@ public class EnemyNPC : MonoBehaviour
 
     void hitPlayer()
     {
-        // We will add damage here later.
-        // kill player instantly
+        // Kill the player when caught.
         player.GetComponent<PlayerController>()?.Die();
 
         bouncing = true;
@@ -89,7 +112,26 @@ public class EnemyNPC : MonoBehaviour
         Vector3 destination = transform.position + direction * bounceDistance;
         destination = keepInArea(destination);
 
-        navMeshAgent.SetDestination(destination);
+        NavMeshHit hit;
+
+        if (NavMesh.SamplePosition(destination, out hit, 2f, NavMesh.AllAreas))
+        {
+            NavMeshPath path = new NavMeshPath();
+
+            if (navMeshAgent.CalculatePath(hit.position, path) &&
+                path.status == NavMeshPathStatus.PathComplete)
+            {
+                navMeshAgent.SetDestination(hit.position);
+            }
+            else
+            {
+                bouncing = false;
+            }
+        }
+        else
+        {
+            bouncing = false;
+        }
     }
 
     void OnDrawGizmosSelected()
