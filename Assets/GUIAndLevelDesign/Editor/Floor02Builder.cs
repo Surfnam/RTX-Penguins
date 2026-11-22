@@ -44,11 +44,11 @@ public static class Floor02Builder
 
         // Stalactite corridor: staggered walls force a zig-zag.
         Box("Cave Floor", new Vector3(0f, 3f, 4f), new Vector3(22f, 1f, 18f), ice, platforms);
-        Box("Cave West Wall", new Vector3(-11.5f, 5.5f, 4f), new Vector3(1f, 4f, 18f), rock, platforms);
-        Box("Cave East Wall", new Vector3(11.5f, 5.5f, 4f), new Vector3(1f, 4f, 18f), rock, platforms);
-        Box("Wall A", new Vector3(-5f, 5.5f, 0f), new Vector3(10f, 4f, 1f), rock, platforms);
-        Box("Wall B", new Vector3(5f, 5.5f, 6f), new Vector3(10f, 4f, 1f), rock, platforms);
-        Box("Wall C", new Vector3(0f, 5.5f, 10f), new Vector3(8f, 4f, 1f), rock, platforms);
+        Box("Cave West Wall", new Vector3(-11.5f, 6.5f, 4f), new Vector3(1f, 6f, 18f), rock, platforms);
+        Box("Cave East Wall", new Vector3(11.5f, 6.5f, 4f), new Vector3(1f, 6f, 18f), rock, platforms);
+        Box("Wall A", new Vector3(-5f, 6.5f, 0f), new Vector3(10f, 6f, 1f), rock, platforms);
+        Box("Wall B", new Vector3(5f, 6.5f, 6f), new Vector3(10f, 6f, 1f), rock, platforms);
+        Box("Wall C", new Vector3(0f, 6.5f, 10f), new Vector3(8f, 6f, 1f), rock, platforms);
         Box("East Shelf", new Vector3(9.5f, 4.5f, 8f), new Vector3(3f, 1f, 3f), accent, platforms);
 
         // Stepping stones over the lava pit, each a little higher than the last.
@@ -203,7 +203,7 @@ public static class Floor02Builder
         Turret turret = head.AddComponent<Turret>();
         turret.player = player;
         turret.ballPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(TurretBallPrefab);
-        turret.maxDistance = 14f;
+        turret.maxDistance = 10f;
         turret.secondsBetweenShots = 2.5f;
         turret.ballSpeed = 8f;
     }
@@ -255,9 +255,11 @@ public static class Floor02Builder
         Box("Exit Right", position + new Vector3(2.3f, 1.8f, 0f), new Vector3(1f, 4.5f, 1f), wall, frame);
         Box("Exit Top", position + new Vector3(0f, 4f, 0f), new Vector3(5.6f, 1f, 1f), wall, frame);
         GameObject portal = Box("Exit Portal - Win UI Hook", position + new Vector3(0f, 1.7f, 0f), new Vector3(3.6f, 3.5f, 0.35f), goal, frame);
-        portal.GetComponent<BoxCollider>().isTrigger = true;
-        // MenuStateTrigger expects a solid gate collider next to the trigger and opens it once the player has all pieces.
-        portal.AddComponent<BoxCollider>();
+        // Sizes match Floor 01: a wide trigger so the player reaches it, and a smaller solid gate inside it.
+        BoxCollider portalTrigger = portal.GetComponent<BoxCollider>();
+        portalTrigger.isTrigger = true;
+        portalTrigger.size = new Vector3(1.5f, 1.5f, 3.5f);
+        portal.AddComponent<BoxCollider>().size = new Vector3(0.8f, 0.8f, 0.8f);
         MenuStateTrigger trigger = portal.AddComponent<MenuStateTrigger>();
         trigger.TriggerResult = MenuStateTrigger.Result.Win;
     }

@@ -9,6 +9,7 @@ public class AudioManager : MonoBehaviour
     private const float FadeSeconds = 1.5f;
     private const float DuckedFraction = 0.2f;
     private const float MusicVolume = 0.6f;
+    private const float DangerHoldSeconds = 1.5f;
 
     public static AudioManager Instance { get; private set; }
     public static MusicState CurrentState => Instance != null ? Instance.current : MusicState.Silent;
@@ -22,6 +23,7 @@ public class AudioManager : MonoBehaviour
     private bool menuOpen;
     private MusicState current = MusicState.Silent;
     private float duckUntil;
+    private float lastDangerTime = float.NegativeInfinity;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Create()
@@ -75,12 +77,18 @@ public class AudioManager : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         danger.Clear();
-        menuOpen = false;
     }
 
     private void Update()
     {
-        MusicState target = MusicStateResolver.Resolve(menuOpen, danger.Active);
+        // Hold danger briefly after the last source lets go, so a flickering line of sight does not restart the track.
+        if (danger.Active)
+        {
+            lastDangerTime = Time.unscaledTime;
+        }
+        bool dangerNearby = Time.unscaledTime - lastDangerTime < DangerHoldSeconds;
+
+        MusicState target = MusicStateResolver.Resolve(menuOpen, dangerNearby);
         if (target != current)
         {
             SwitchMusic(target);
@@ -106,11 +114,20 @@ public class AudioManager : MonoBehaviour
     private void SwitchMusic(MusicState state)
     {
         current = state;
-        activeMusic = 1 - activeMusic;
+        AudioClip clip = Load("Audio/Music/" + state.ToString().ToLowerInvariant());
 
+        // If the other source is still fading out this same clip, bring it back instead of restarting the track.
+        AudioSource other = musicSources[1 - activeMusic];
+        if (clip != null && other.clip == clip && other.isPlaying)
+        {
+            activeMusic = 1 - activeMusic;
+            return;
+        }
+
+        activeMusic = 1 - activeMusic;
         AudioSource next = musicSources[activeMusic];
-        next.clip = Load("Audio/Music/" + state.ToString().ToLowerInvariant());
-        if (next.clip != null)
+        next.clip = clip;
+        if (clip != null)
         {
             next.volume = 0f;
             next.Play();

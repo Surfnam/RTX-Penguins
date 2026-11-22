@@ -217,6 +217,10 @@ public class PlayerController : MonoBehaviour
         transform.position = currentCheckpoint;
         controller.enabled = true;
 
+        // drop the fall speed so respawning does not play a landing sound or carry momentum
+        velocity = Vector3.zero;
+        wasGrounded = true;
+
         // fire respawn event
         OnPlayerRespawn?.Invoke();
     }
