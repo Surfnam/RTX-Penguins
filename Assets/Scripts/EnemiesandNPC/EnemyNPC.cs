@@ -24,6 +24,9 @@ public class EnemyNPC : MonoBehaviour
 
     void Update()
     {
+        // the enemy chases while the player is in its area, so that is when music turns tense
+        AudioManager.SetDanger(this, playerInArea());
+
         if (bouncing)
         {
             if (!navMeshAgent.pathPending && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
@@ -49,6 +52,11 @@ public class EnemyNPC : MonoBehaviour
         {
             navMeshAgent.ResetPath();
         }
+    }
+
+    void OnDisable()
+    {
+        AudioManager.SetDanger(this, false);
     }
 
     bool playerInArea()
