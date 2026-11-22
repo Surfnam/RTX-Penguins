@@ -114,7 +114,14 @@ public class AudioManager : MonoBehaviour
     private void SwitchMusic(MusicState state)
     {
         current = state;
-        AudioClip clip = Load("Audio/Music/" + state.ToString().ToLowerInvariant());
+        AudioClip clip = Load("Audio/Music/" + MusicClipName(state));
+
+        // Same track already playing (menu shares the explore track): keep it going without a restart.
+        AudioSource playing = musicSources[activeMusic];
+        if (clip != null && playing.clip == clip && playing.isPlaying)
+        {
+            return;
+        }
 
         // If the other source is still fading out this same clip, bring it back instead of restarting the track.
         AudioSource other = musicSources[1 - activeMusic];
@@ -132,6 +139,12 @@ public class AudioManager : MonoBehaviour
             next.volume = 0f;
             next.Play();
         }
+    }
+
+    // The menu plays the explore track, so pausing does not change the song.
+    private static string MusicClipName(MusicState state)
+    {
+        return state == MusicState.Menu ? "explore" : state.ToString().ToLowerInvariant();
     }
 
     private AudioClip Load(string path)
