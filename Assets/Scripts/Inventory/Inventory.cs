@@ -149,6 +149,32 @@ public class Inventory : MonoBehaviour
             return false;
         }
 
+        AddToSlot(index, incoming);
+        OnChanged?.Invoke();
+        return true;
+    }
+
+    public bool TryPurchase(InventorySlot incoming, int price)
+    {
+        if (incoming == null || !incoming.isConsumable || incoming.count <= 0 || price < 0 || coins < price)
+        {
+            return false;
+        }
+
+        int index = FindSlotFor(incoming);
+        if (index < 0)
+        {
+            return false;
+        }
+
+        coins -= price;
+        AddToSlot(index, incoming);
+        OnChanged?.Invoke();
+        return true;
+    }
+
+    private void AddToSlot(int index, InventorySlot incoming)
+    {
         if (slots[index] == null)
         {
             slots[index] = incoming;
@@ -157,8 +183,6 @@ public class Inventory : MonoBehaviour
         {
             slots[index].count += incoming.count;
         }
-        OnChanged?.Invoke();
-        return true;
     }
 
     // Consumables of the same type stack, items always take their own slot.

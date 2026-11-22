@@ -3,6 +3,8 @@ using UnityEngine.SceneManagement;
 
 public class PenguinMenuController : MonoBehaviour
 {
+    private const int JumpPotionPrice = 5;
+
     public enum ScreenState
     {
         Start,
@@ -10,23 +12,33 @@ public class PenguinMenuController : MonoBehaviour
         Settings,
         Paused,
         Win,
-        Lose
+        Lose,
+        Shop
     }
-
     [SerializeField] private ScreenState currentScreen = ScreenState.Start;
 
     private ScreenState settingsReturnScreen = ScreenState.Start;
+    private ScreenState shopReturnScreen = ScreenState.Win;
     private GUIStyle titleStyle;
     private GUIStyle subtitleStyle;
     private GUIStyle buttonStyle;
     private GUIStyle panelStyle;
     private GUIStyle labelStyle;
+    private Inventory shopInventory;
+    private Sprite jumpPotionIcon;
+    private string shopMessage = "";
 
     public ScreenState CurrentScreen => currentScreen;
     public bool IsGameplayActive => currentScreen == ScreenState.Playing;
 
     private void Awake()
     {
+        jumpPotionIcon = Resources.Load<Sprite>("Inventory/JumpPotionIcon");
+        if (jumpPotionIcon == null)
+        {
+            Debug.LogError("Jump potion icon is missing at Resources/Inventory/JumpPotionIcon.");
+        }
+
         ApplyScreenState(currentScreen);
     }
 
@@ -53,6 +65,10 @@ public class PenguinMenuController : MonoBehaviour
             else if (currentScreen == ScreenState.Settings)
             {
                 ApplyScreenState(settingsReturnScreen);
+            }
+            else if (currentScreen == ScreenState.Shop)
+            {
+                ApplyScreenState(shopReturnScreen);
             }
         }
     }
@@ -116,6 +132,9 @@ public class PenguinMenuController : MonoBehaviour
                 break;
             case ScreenState.Lose:
                 DrawEndMenu(false);
+                break;
+            case ScreenState.Shop:
+                DrawShop();
                 break;
         }
         GUILayout.EndArea();
@@ -206,6 +225,13 @@ public class PenguinMenuController : MonoBehaviour
 
         if (won)
         {
+            if (GUILayout.Button("OPEN SHOP", buttonStyle, GUILayout.Height(50f)))
+            {
+                OpenShop();
+            }
+
+            GUILayout.Space(10f);
+
             if (ClickButton("PLAY AGAIN", buttonStyle, GUILayout.Height(60f)))
             {
                 ReloadLevel();
@@ -230,6 +256,46 @@ public class PenguinMenuController : MonoBehaviour
         GUILayout.FlexibleSpace();
     }
 
+    private void DrawShop()
+    {
+        GUILayout.Label("EXPEDITION SHOP", titleStyle);
+        GUILayout.Label("SPEND YOUR COLLECTED COINS", subtitleStyle);
+        GUILayout.Space(24f);
+        GUILayout.Label($"COINS: {(shopInventory != null ? shopInventory.coins : 0)}", labelStyle);
+        GUILayout.Space(16f);
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if (jumpPotionIcon != null)
+        {
+            Rect iconRect = GUILayoutUtility.GetRect(22.5f, 31.5f, GUILayout.ExpandWidth(false));
+            Rect iconUv = new Rect(3f / 16f, 1f / 16f, 10f / 16f, 14f / 16f);
+            GUI.DrawTextureWithTexCoords(iconRect, jumpPotionIcon.texture, iconUv, true);
+        }
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+        GUILayout.Label("JUMP BOOST POTION", subtitleStyle);
+        float duration = shopInventory != null ? shopInventory.GetComponent<JumpBoost>().duration : 10f;
+        GUILayout.Label($"Boosts jump height for {duration:0.#} seconds.", labelStyle);
+        GUILayout.Space(8f);
+
+        if (GUILayout.Button($"BUY  -  {JumpPotionPrice} COINS", buttonStyle, GUILayout.Height(58f)))
+        {
+            BuyJumpPotion();
+        }
+
+        if (!string.IsNullOrEmpty(shopMessage))
+        {
+            GUILayout.Space(8f);
+            GUILayout.Label(shopMessage, labelStyle);
+        }
+
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("BACK TO RESULTS", buttonStyle, GUILayout.Height(54f)))
+        {
+            ApplyScreenState(shopReturnScreen);
+        }
+    }
+
     private void DrawHud()
     {
         GUI.Label(new Rect(24f, 18f, 460f, 36f), "FLOOR 01  •  FIND THE FOUR PIECE MARKERS", labelStyle);
@@ -240,6 +306,49 @@ public class PenguinMenuController : MonoBehaviour
     {
         settingsReturnScreen = returnScreen;
         ApplyScreenState(ScreenState.Settings);
+    }
+
+    private void OpenShop()
+    {
+        if (currentScreen != ScreenState.Win)
+        {
+            return;
+        }
+
+        shopReturnScreen = currentScreen;
+        shopInventory = FindFirstObjectByType<Inventory>();
+        shopMessage = "";
+        ApplyScreenState(ScreenState.Shop);
+    }
+
+    private void BuyJumpPotion()
+    {
+        if (shopInventory == null)
+        {
+            shopMessage = "INVENTORY IS UNAVAILABLE.";
+            return;
+        }
+
+        InventorySlot potion = new InventorySlot
+        {
+            itemName = "Jump Boost Potion",
+            icon = Resources.Load<Sprite>("Inventory/JumpPotionIcon"),
+            isConsumable = true,
+            consumable = ConsumableType.JumpBoost
+        };
+
+        if (shopInventory.TryPurchase(potion, JumpPotionPrice))
+        {
+            shopMessage = "JUMP BOOST POTION PURCHASED!";
+        }
+        else if (shopInventory.coins < JumpPotionPrice)
+        {
+            shopMessage = "NOT ENOUGH COINS.";
+        }
+        else
+        {
+            shopMessage = "INVENTORY FULL.";
+        }
     }
 
     private void ReloadLevel()
