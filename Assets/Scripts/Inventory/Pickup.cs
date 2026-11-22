@@ -65,10 +65,15 @@ public class Pickup : MonoBehaviour
         if (kind == PickupKind.Coin)
         {
             inventory.AddCoins(amount);
+            AudioManager.PlaySfx("coin");
         }
         else if (!inventory.TryAdd(ToSlot()))
         {
             return;
+        }
+        else
+        {
+            AudioManager.PlaySfx("pickup");
         }
         Destroy(gameObject);
     }

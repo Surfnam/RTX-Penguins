@@ -38,6 +38,7 @@ public class PuzzlePiece : MonoBehaviour
     private void CollectPiece(Transform player)
     {
         isCollected = true;
+        AudioManager.PlaySfx("piece");
         playerTransform = player;
         startYOffset = transform.position.y - playerTransform.position.y;
         

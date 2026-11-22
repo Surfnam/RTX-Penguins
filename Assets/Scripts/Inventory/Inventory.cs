@@ -191,6 +191,7 @@ public class Inventory : MonoBehaviour
         if (slot.isConsumable)
         {
             ApplyConsumable(slot.consumable);
+            AudioManager.PlaySfx("potion");
             slot.count--;
         }
         else

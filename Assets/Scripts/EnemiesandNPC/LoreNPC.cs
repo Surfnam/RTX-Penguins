@@ -28,6 +28,7 @@ public class LoreNPC : MonoBehaviour
     private bool waiting = true;
     
     private bool isPlayerNear = false;
+    private bool wasPlayerNear = false;
     private GUIStyle dialogueStyle;
 
     void Start()
@@ -53,6 +54,12 @@ public class LoreNPC : MonoBehaviour
         float distance = Vector3.Distance(transform.position, player.transform.position);
         
         isPlayerNear = (distance <= interactionDistance);
+
+        if (isPlayerNear && !wasPlayerNear)
+        {
+            AudioManager.PlaySfx("npc_chime");
+        }
+        wasPlayerNear = isPlayerNear;
 
         if (isPlayerNear)
         {
