@@ -48,6 +48,7 @@ public class Turret : MonoBehaviour
 
     void shootBall()
     {
+        AudioManager.PlaySfx("turret_shot");
         GameObject ball = Instantiate(ballPrefab, transform.position, Quaternion.identity);
 
         Vector3 direction = player.transform.position - transform.position;

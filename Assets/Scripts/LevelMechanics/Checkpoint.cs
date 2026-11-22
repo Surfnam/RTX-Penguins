@@ -29,6 +29,7 @@ public class Checkpoint : MonoBehaviour
         if (!isActivated && other.CompareTag("Player"))
         {
             isActivated = true;
+            AudioManager.PlaySfx("checkpoint");
             
             // set new respawn point to the center of this pad
             other.GetComponent<PlayerController>()?.SetCheckpoint(transform.position);

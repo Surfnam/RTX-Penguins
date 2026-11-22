@@ -76,6 +76,7 @@ public class EnemyNPC : MonoBehaviour
 
     void hitPlayer()
     {
+        AudioManager.PlaySfx("enemy_hit");
         // We will add damage here later.
         // kill player instantly
         player.GetComponent<PlayerController>()?.Die();
