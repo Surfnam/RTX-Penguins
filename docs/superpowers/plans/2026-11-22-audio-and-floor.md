@@ -55,7 +55,7 @@
 **Interfaces:**
 - Produces: `public enum MusicState { Silent, Menu, Explore, Danger }`
 - Produces: `public static class MusicStateResolver { public static MusicState Resolve(bool menuOpen, bool dangerNearby); }` — menuOpen wins, then danger, else Explore.
-- Produces: `public class AudioManager : MonoBehaviour` with `public static AudioManager Instance`, `public static void PlaySfx(string name, float volume = 1f)`, `public static void PlayStinger(string name)`, `public static void SetDanger(bool nearby)`, `public static void SetMenuOpen(bool open)`. Static methods no-op when no instance.
+- Produces: `public class AudioManager : MonoBehaviour` with `public static AudioManager Instance`, `public static void PlaySfx(string name, float volume = 1f)`, `public static void PlayStinger(string name)`, `public static void SetDanger(Object source, bool nearby)`, `public static void SetMenuOpen(bool open)`. Static methods no-op when no instance.
 - Music clip names loaded: `Audio/Music/menu`, `explore`, `danger`.
 
 - [ ] **Step 1: Write failing self-check** in `AudioSelfCheck.Run()` (menu `Tools/Audio Self Check`): assert `Resolve(true,true)==Menu`, `Resolve(false,true)==Danger`, `Resolve(false,false)==Explore`; assert `AudioManager.PlaySfx("does_not_exist")` does not throw with and without an instance.
