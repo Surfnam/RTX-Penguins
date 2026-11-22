@@ -15,6 +15,7 @@ public class Turret : MonoBehaviour
     void Update()
     {
         float distance = Vector3.Distance(transform.position, player.transform.position);
+        bool inSight = false;
 
         if (distance <= maxDistance)
         {
@@ -25,6 +26,7 @@ public class Turret : MonoBehaviour
             {
                 if (hit.collider.gameObject == player)
                 {
+                    inSight = true;
                     shootTimer += Time.deltaTime;
 
                     if (shootTimer >= secondsBetweenShots)
@@ -44,10 +46,18 @@ public class Turret : MonoBehaviour
         {
             shootTimer = 0f;
         }
+
+        AudioManager.SetDanger(this, inSight);
+    }
+
+    void OnDisable()
+    {
+        AudioManager.SetDanger(this, false);
     }
 
     void shootBall()
     {
+        AudioManager.PlaySfx("turret_shot");
         GameObject ball = Instantiate(ballPrefab, transform.position, Quaternion.identity);
 
         Vector3 direction = player.transform.position - transform.position;

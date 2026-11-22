@@ -49,6 +49,9 @@ public class PenguinMenuController : MonoBehaviour
 
     private void Update()
     {
+        // sent every frame because the AudioManager is created after this object's Awake
+        AudioManager.SetMenuOpen(currentScreen != ScreenState.Playing);
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (currentScreen == ScreenState.Playing)
@@ -70,10 +73,21 @@ public class PenguinMenuController : MonoBehaviour
         }
     }
 
+    private static bool ClickButton(string text, GUIStyle style, params GUILayoutOption[] options)
+    {
+        bool pressed = GUILayout.Button(text, style, options);
+        if (pressed)
+        {
+            AudioManager.PlaySfx("ui_click");
+        }
+        return pressed;
+    }
+
     public void ShowWin()
     {
         if (currentScreen == ScreenState.Playing)
         {
+            AudioManager.PlayStinger("win");
             ApplyScreenState(ScreenState.Win);
         }
     }
@@ -82,6 +96,7 @@ public class PenguinMenuController : MonoBehaviour
     {
         if (currentScreen == ScreenState.Playing)
         {
+            AudioManager.PlayStinger("lose");
             ApplyScreenState(ScreenState.Lose);
         }
     }
@@ -130,12 +145,12 @@ public class PenguinMenuController : MonoBehaviour
         GUILayout.Label("RTX PENGUINS", titleStyle);
         GUILayout.Label("LABYRINTH ASCENT", subtitleStyle);
         GUILayout.FlexibleSpace();
-        if (GUILayout.Button("BEGIN ASCENT", buttonStyle, GUILayout.Height(58f)))
+        if (ClickButton("BEGIN ASCENT", buttonStyle, GUILayout.Height(58f)))
         {
             ApplyScreenState(ScreenState.Playing);
         }
         GUILayout.Space(14f);
-        if (GUILayout.Button("SETTINGS", buttonStyle, GUILayout.Height(58f)))
+        if (ClickButton("SETTINGS", buttonStyle, GUILayout.Height(58f)))
         {
             OpenSettings(ScreenState.Start);
         }
@@ -148,17 +163,17 @@ public class PenguinMenuController : MonoBehaviour
         GUILayout.Label("PAUSED", titleStyle);
         GUILayout.Label("THE LABYRINTH WAITS", subtitleStyle);
         GUILayout.FlexibleSpace();
-        if (GUILayout.Button("RESUME", buttonStyle, GUILayout.Height(58f)))
+        if (ClickButton("RESUME", buttonStyle, GUILayout.Height(58f)))
         {
             ApplyScreenState(ScreenState.Playing);
         }
         GUILayout.Space(14f);
-        if (GUILayout.Button("SETTINGS", buttonStyle, GUILayout.Height(58f)))
+        if (ClickButton("SETTINGS", buttonStyle, GUILayout.Height(58f)))
         {
             OpenSettings(ScreenState.Paused);
         }
         GUILayout.Space(14f);
-        if (GUILayout.Button("RESTART LEVEL", buttonStyle, GUILayout.Height(58f)))
+        if (ClickButton("RESTART LEVEL", buttonStyle, GUILayout.Height(58f)))
         {
             ReloadLevel();
         }
@@ -185,14 +200,14 @@ public class PenguinMenuController : MonoBehaviour
         string qualityName = QualitySettings.names.Length > 0
             ? QualitySettings.names[QualitySettings.GetQualityLevel()]
             : "DEFAULT";
-        if (GUILayout.Button($"QUALITY:  {qualityName.ToUpperInvariant()}", buttonStyle, GUILayout.Height(52f)))
+        if (ClickButton($"QUALITY:  {qualityName.ToUpperInvariant()}", buttonStyle, GUILayout.Height(52f)))
         {
             int count = Mathf.Max(1, QualitySettings.names.Length);
             QualitySettings.SetQualityLevel((QualitySettings.GetQualityLevel() + 1) % count, true);
         }
 
         GUILayout.FlexibleSpace();
-        if (GUILayout.Button("BACK", buttonStyle, GUILayout.Height(58f)))
+        if (ClickButton("BACK", buttonStyle, GUILayout.Height(58f)))
         {
             ApplyScreenState(settingsReturnScreen);
         }
@@ -217,14 +232,14 @@ public class PenguinMenuController : MonoBehaviour
 
             GUILayout.Space(10f);
 
-            if (GUILayout.Button("PLAY AGAIN", buttonStyle, GUILayout.Height(60f)))
+            if (ClickButton("PLAY AGAIN", buttonStyle, GUILayout.Height(60f)))
             {
                 ReloadLevel();
             }
 
             GUILayout.Space(10f);
 
-            if (GUILayout.Button("CONTINUE WITH DASH", buttonStyle, GUILayout.Height(50f)))
+            if (ClickButton("CONTINUE WITH DASH", buttonStyle, GUILayout.Height(50f)))
             {
                 ContinueLevel();
             }
@@ -232,7 +247,7 @@ public class PenguinMenuController : MonoBehaviour
         else
         {
             // close menu and unpause to continue from checkpoint
-            if (GUILayout.Button("RETRY (CHECKPOINT)", buttonStyle, GUILayout.Height(60f)))
+            if (ClickButton("RETRY (CHECKPOINT)", buttonStyle, GUILayout.Height(60f)))
             {
                 ApplyScreenState(ScreenState.Playing);
             }
