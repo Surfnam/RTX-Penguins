@@ -1,4 +1,4 @@
-# Audio system and Floor 02 — design
+# Audio system and the Ice Cave floor — design
 
 ## Intent
 Add sound effects and state-aware background music to RTX Penguins, and add one new unique floor (this teammate's level, one per person).
@@ -30,8 +30,8 @@ Add sound effects and state-aware background music to RTX Penguins, and add one 
 - `AudioManager` singleton created at runtime (RuntimeInitializeOnLoad, same pattern as LevelRuntimeBootstrap). Loads clips from `Resources/Audio/{Music,SFX}` by name; missing clips are skipped.
 - Music state machine with two crossfading AudioSources: Menu, Explore, Danger, plus Win/Lose stingers. Respects `AudioListener.volume` (menu slider).
 - SFX hooks added with small calls (`AudioManager.PlaySfx(...)`) in PlayerController, Pickup, Checkpoint, PuzzlePiece, PenguinMenuController, MenuStateTrigger, Turret, EnemyNPC.
-- `Floor02Builder` editor menu item (`RTX Penguins > Build Floor 02`) generates `Assets/Scenes/Floor02.unity`, adds it to Build Settings.
+- `FloorIceCaveBuilder` editor menu item (`RTX Penguins > Build Ice Cave Floor`) generates `Assets/Scenes/FloorIceCave.unity`, adds it to Build Settings.
 - Credits for Blue Lava and Kenney go in the README.
 
 ## Left to the builder
-Exact layout and hazard placement of Floor 02, clip-to-event mapping, volume levels.
+Exact layout and hazard placement of the Ice Cave floor, clip-to-event mapping, volume levels.

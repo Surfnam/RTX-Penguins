@@ -4,15 +4,15 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 // Frozen-cave floor: a descending ice stair, a stalactite corridor, stepping stones over lava, a turret-guarded
-// ice bridge and a final climb. Build from RTX Penguins > Build Floor 02, check with RTX Penguins > Validate Floor 02.
-public static class Floor02Builder
+// ice bridge and a final climb. Build from RTX Penguins > Build Ice Cave Floor, check with RTX Penguins > Validate Ice Cave Floor.
+public static class FloorIceCaveBuilder
 {
-    private const string ScenePath = "Assets/Scenes/Floor02.unity";
+    private const string ScenePath = "Assets/Scenes/FloorIceCave.unity";
     private const string MaterialFolder = "Assets/GUIAndLevelDesign/Materials";
     private const string CheckpointPrefab = "Assets/Prefabs/Checkpoint.prefab";
     private const string TurretBallPrefab = "Assets/Prefabs/Turret Ball.prefab";
 
-    [MenuItem("RTX Penguins/Build Floor 02")]
+    [MenuItem("RTX Penguins/Build Ice Cave Floor")]
     public static void BuildFloor()
     {
         if (!AssetDatabase.IsValidFolder(MaterialFolder))
@@ -22,15 +22,15 @@ public static class Floor02Builder
 
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
-        Material ice = GetMaterial("F2_Ice", new Color(0.55f, 0.85f, 0.95f), 0.8f);
-        Material rock = GetMaterial("F2_Rock", new Color(0.12f, 0.14f, 0.2f), 0.2f);
-        Material lava = GetMaterial("F2_Lava", new Color(1f, 0.3f, 0.05f), 0.4f);
-        Material accent = GetMaterial("F2_Accent", new Color(0.7f, 1f, 1f), 0.9f);
-        Material piece = GetMaterial("F2_Piece", new Color(1f, 0.58f, 0.06f), 0.7f);
-        Material goal = GetMaterial("F2_Goal", new Color(0.1f, 0.95f, 0.4f), 0.65f);
-        Material deepRock = GetMaterial("F2_DeepRock", new Color(0.05f, 0.06f, 0.1f), 0.1f);
+        Material ice = GetMaterial("IceCave_Ice", new Color(0.55f, 0.85f, 0.95f), 0.8f);
+        Material rock = GetMaterial("IceCave_Rock", new Color(0.12f, 0.14f, 0.2f), 0.2f);
+        Material lava = GetMaterial("IceCave_Lava", new Color(1f, 0.3f, 0.05f), 0.4f);
+        Material accent = GetMaterial("IceCave_Accent", new Color(0.7f, 1f, 1f), 0.9f);
+        Material piece = GetMaterial("IceCave_Piece", new Color(1f, 0.58f, 0.06f), 0.7f);
+        Material goal = GetMaterial("IceCave_Goal", new Color(0.1f, 0.95f, 0.4f), 0.65f);
+        Material deepRock = GetMaterial("IceCave_DeepRock", new Color(0.05f, 0.06f, 0.1f), 0.1f);
 
-        GameObject root = new GameObject("FROZEN_CAVE_FLOOR_02");
+        GameObject root = new GameObject("ICE_CAVE_FLOOR");
         Transform platforms = NewGroup("Platforms", root.transform);
         Transform hazards = NewGroup("Lava_Hazards", root.transform);
         Transform markers = NewGroup("Puzzle_Piece_Placement_Markers", root.transform);
@@ -98,10 +98,10 @@ public static class Floor02Builder
         EditorSceneManager.SaveScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene(), ScenePath);
         AddSceneToBuildSettings();
         AssetDatabase.SaveAssets();
-        Debug.Log($"Built Floor 02 at {ScenePath}");
+        Debug.Log($"Built Ice Cave floor at {ScenePath}");
     }
 
-    [MenuItem("RTX Penguins/Validate Floor 02")]
+    [MenuItem("RTX Penguins/Validate Ice Cave Floor")]
     public static void ValidateFloor()
     {
         EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
@@ -136,7 +136,7 @@ public static class Floor02Builder
         ThirdPersonCamera camera = Object.FindFirstObjectByType<ThirdPersonCamera>();
         Require(camera != null && camera.player != null, "Camera is not connected to the player.");
 
-        Debug.Log("FLOOR 02 VALIDATION PASSED");
+        Debug.Log("ICE CAVE FLOOR VALIDATION PASSED");
     }
 
     private static void Require(bool condition, string message)
@@ -222,9 +222,9 @@ public static class Floor02Builder
         player.AddComponent<Inventory>();
         player.AddComponent<InventoryHUD>();
         player.AddComponent<PlayerPuzzlePiece>();
-        player.GetComponent<Renderer>().sharedMaterial = GetMaterial("F2_Player", new Color(0.04f, 0.05f, 0.07f), 0.25f);
+        player.GetComponent<Renderer>().sharedMaterial = GetMaterial("IceCave_Player", new Color(0.04f, 0.05f, 0.07f), 0.25f);
 
-        GameObject beak = Box("Beak", player.transform.position + new Vector3(0f, 0.25f, 0.48f), new Vector3(0.35f, 0.2f, 0.35f), GetMaterial("F2_Beak", new Color(1f, 0.55f, 0.05f), 0.3f), player.transform);
+        GameObject beak = Box("Beak", player.transform.position + new Vector3(0f, 0.25f, 0.48f), new Vector3(0.35f, 0.2f, 0.35f), GetMaterial("IceCave_Beak", new Color(1f, 0.55f, 0.05f), 0.3f), player.transform);
         Object.DestroyImmediate(beak.GetComponent<Collider>());
 
         GameObject cameraObject = new GameObject("Main Camera");
