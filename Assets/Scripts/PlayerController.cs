@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     public float baseJumpHeight = 2.2f;
     public float gravity = -20f;
     private bool hasDoubleJumped;
+    private bool wasGrounded;
 
     [Header("Dash Variables")]
     public bool canDash = false;
@@ -63,6 +64,13 @@ public class PlayerController : MonoBehaviour
         }
 
         bool grounded = controller.isGrounded;
+
+        // only a real fall makes a landing sound, slope flicker stays quiet
+        if (grounded && !wasGrounded && velocity.y < -5f)
+        {
+            AudioManager.PlaySfx("land");
+        }
+        wasGrounded = grounded;
 
         if (grounded && velocity.y < 0f)
         {
@@ -127,6 +135,7 @@ public class PlayerController : MonoBehaviour
             if (grounded)
             {
                 velocity.y = Mathf.Sqrt(baseJumpHeight * -2f * gravity);
+                AudioManager.PlaySfx("jump");
                 if (animator != null) animator.SetTrigger("Jump");
                 Debug.Log("i am able to jump");
             }
@@ -134,6 +143,7 @@ public class PlayerController : MonoBehaviour
             {
                 hasDoubleJumped = true;
                 velocity.y = Mathf.Sqrt(baseJumpHeight * -2f * gravity);
+                AudioManager.PlaySfx("jump");
                 if (animator != null) animator.SetTrigger("Jump");
             }
         }
@@ -151,6 +161,7 @@ public class PlayerController : MonoBehaviour
             isDashing = true;
             dashTimer = dashDuration;
             nextDashTime = Time.time + dashCooldown;
+            AudioManager.PlaySfx("dash");
 
             velocity.y = 0f;
 
@@ -196,6 +207,8 @@ public class PlayerController : MonoBehaviour
 
     public void Die()
     {
+        AudioManager.PlaySfx("death");
+
         // trigger death event so inventory drops coins
         OnPlayerDeath?.Invoke();
 
@@ -203,6 +216,10 @@ public class PlayerController : MonoBehaviour
         controller.enabled = false;
         transform.position = currentCheckpoint;
         controller.enabled = true;
+
+        // drop the fall speed so respawning does not play a landing sound or carry momentum
+        velocity = Vector3.zero;
+        wasGrounded = true;
 
         // fire respawn event
         OnPlayerRespawn?.Invoke();
